@@ -4,127 +4,131 @@ import re
 import random
 import json
 
+
 class ProxyChecker:
-	def __init__(self):
-		self.ip = self.get_ip()
-		self.proxy_judges = self.get_proxy_judges()
+    def __init__(self):
+        self.ip = self.get_ip()
+        self.proxy_judges = [
+            'http://proxyjudge.us/azenv.php',
+            'http://mojeip.net.pl/asdfa/azenv.php'
+        ]
 
-	def get_ip(self):
-		return '<ip>'
+    def get_ip(self):
+        r = self.send_query(url='https://api.ipify.org/')
 
-	def get_proxy_judges(self):
-		return [
-			'http://proxyjudge.us/azenv.php',
-			'http://mojeip.net.pl/asdfa/azenv.php'
-		]
+        if not r:
+            return ""
 
-	def send_query(self, proxy, url=None):
-		response = BytesIO()
+        return r['response']
 
-		c = pycurl.Curl()
+    def send_query(self, proxy=False, url=None):
+        response = BytesIO()
+        c = pycurl.Curl()
 
-		c.setopt(c.URL, url or random.choice(self.proxy_judges))
-		c.setopt(c.WRITEDATA, response)
-		c.setopt(c.TIMEOUT, 5)
+        c.setopt(c.URL, url or random.choice(self.proxy_judges))
+        c.setopt(c.WRITEDATA, response)
+        c.setopt(c.TIMEOUT, 5)
 
-		c.setopt(c.SSL_VERIFYHOST, 0)
-		c.setopt(c.SSL_VERIFYPEER, 0)
+        c.setopt(c.SSL_VERIFYHOST, 0)
+        c.setopt(c.SSL_VERIFYPEER, 0)
 
-		if proxy:
-			c.setopt(c.PROXY, proxy)
+        if proxy:
+            c.setopt(c.PROXY, proxy)
 
-		# Perform request
-		try:
-			c.perform()
-		except Exception as e:
-			# print(e)
-			return False
+        # Perform request
+        try:
+            c.perform()
+        except Exception as e:
+            # print(e)
+            return False
 
-		# Return false if status code is not 200 
-		if c.getinfo(c.HTTP_CODE) != 200:
-			return False
-			
-		# Calculate request timeout
-		timeout = round(c.getinfo(c.CONNECT_TIME) * 1000)
+        # Return False if the status is not 200
+        if c.getinfo(c.HTTP_CODE) != 200:
+            return False
 
-		# Decode response content
-		response = response.getvalue().decode('iso-8859-1')
+        # Calculate the request timeout in milliseconds
+        timeout = round(c.getinfo(c.CONNECT_TIME) * 1000)
 
-		return {
-			'timeout': timeout,
-			'response': response
-		}
+        # Decode the response content
+        response = response.getvalue().decode('iso-8859-1')
 
-	def parse_anonymity(self, r):		
-		if self.ip in r:
-			return 'Transparent'
-		
-		privacy_headers = [
-			'VIA',
-			'X-FORWARDED-FOR',
-			'X-FORWARDED',
-			'FORWARDED-FOR',
-			'FORWARDED-FOR-IP',
-			'FORWARDED',
-			'CLIENT-IP',
-			'PROXY-CONNECTION'
-		]
+        return {
+            'timeout': timeout,
+            'response': response
+        }
 
-		if any([header in r for header in privacy_headers]):
-			return 'Anonymous'
+    def parse_anonymity(self, r):
+        if self.ip in r:
+            return 'Transparent'
 
-		return 'Elite'
+        privacy_headers = [
+            'VIA',
+            'X-FORWARDED-FOR',
+            'X-FORWARDED',
+            'FORWARDED-FOR',
+            'FORWARDED-FOR-IP',
+            'FORWARDED',
+            'CLIENT-IP',
+            'PROXY-CONNECTION'
+        ]
 
-	def get_country(self, ip):
-		r = self.send_query(False, url='https://ip2c.org/' + ip)
+        if any([header in r for header in privacy_headers]):
+            return 'Anonymous'
 
-		if r and r['response'][0] == '1':
-			r = r['response'].split(';')
-			return [r[3], r[1]]
-		
-		return ['-', '-']
+        return 'Elite'
 
-	def check_proxy(self, proxy, check_country=True):
-		protocols = {}
-		timeout = 0
+    def get_country(self, ip):
+        r = self.send_query(url='https://ip2c.org/' + ip)
 
-		# Test proxy for each protocol
-		for protocol in ['http', 'socks4', 'socks5']:
-			r = self.send_query(protocol + '://' + proxy)
+        print(r)
 
-			# Check if the request failed
-			if not r:
-				continue
+        if r and r['response'][0] == '1':
+            r = r['response'].split(';')
+            return [r[3], r[1]]
 
-			protocols[protocol] = r
-			timeout += r['timeout']
+        return ['-', '-']
 
-		# Check if the proxy failed all tests
-		if (len(protocols) == 0):
-			return False
+    def check_proxy(self, proxy, check_country=True):
+        protocols = {}
+        timeout = 0
 
-		# Get country
-		if check_country:
-			country = self.get_country(proxy.split(':')[0])
+        # Test the proxy for each protocol
+        for protocol in ['http', 'socks4', 'socks5']:
+            r = self.send_query(proxy=protocol + '://' + proxy)
 
+            # Check if the request failed
+            if not r:
+                continue
 
-		# Check anonymity
-		anonymity = self.parse_anonymity(protocols[random.choice(list(protocols.keys()))]['response'])
+            protocols[protocol] = r
+            timeout += r['timeout']
 
-		# Check anonymity
-		timeout = timeout // len(protocols)
+        # Check if the proxy failed all tests
+        if (len(protocols) == 0):
+            return False
 
-		if check_country:
-			return {
-				'country': country[0],
-				'country_code': country[1],
-				'protocols': list(protocols.keys()),
-				'anonymity': anonymity,
-				'timeout': timeout
-			}
+        # Get country
+        if check_country:
+            country = self.get_country(proxy.split(':')[0])
 
-		return {
-			'protocols': list(protocols.keys()),
-			'anonymity': anonymity,
-			'timeout': timeout
-		}
+        # Check anonymity
+        anonymity = self.parse_anonymity(
+            protocols[random.choice(list(protocols.keys()))]['response'])
+
+        # Check timeout
+        timeout = timeout // len(protocols)
+
+        if check_country:
+            return {
+                'country': country[0],
+                'country_code': country[1],
+                'protocols': list(protocols.keys()),
+                'anonymity': anonymity,
+                'timeout': timeout
+            }
+
+        return {
+            'protocols': list(protocols.keys()),
+            'anonymity': anonymity,
+            'timeout': timeout
+        }
