@@ -80,8 +80,6 @@ class ProxyChecker:
     def get_country(self, ip):
         r = self.send_query(url='https://ip2c.org/' + ip)
 
-        print(r)
-
         if r and r['response'][0] == '1':
             r = r['response'].split(';')
             return [r[3], r[1]]
