@@ -4,7 +4,7 @@ A proxy checker in Python using PycURL, a Python interface to libcurl.
 
 ## Description
 
-The proxy checker takes a proxy as input and use it to send a request to a proxy judge (a website that outputs the information that was sent to it). If the request succeeds, the proxy checker will use the information it receive from the proxy judge to determine the proxy's:
+The proxy checker takes a proxy as input and uses it to send a request to a proxy judge (a website that outputs the information that was sent to it). If the request succeeds, the proxy checker will use the information it receives from the proxy judge to determine the proxy's:
 
 - Country
 - Protocol
