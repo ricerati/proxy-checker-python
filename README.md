@@ -11,9 +11,17 @@ The proxy checker takes a proxy as input and uses it to send a request to a prox
 - Anonymity
 - Speed
 
+## Installation
+
+```console
+pip install proxy-checker
+```
+
 ## Usage
 
 ```python3
+from proxy_checker import ProxyChecker
+
 checker = ProxyChecker()
 checker.check_proxy('<ip>:<port>')
 ```
