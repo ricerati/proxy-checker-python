@@ -86,7 +86,7 @@ class ProxyChecker:
 
         return ['-', '-']
 
-    def check_proxy(self, proxy, check_country=True):
+    def check_proxy(self, proxy, check_country=True, check_address=False):
         protocols = {}
         timeout = 0
 
@@ -116,17 +116,24 @@ class ProxyChecker:
         # Check timeout
         timeout = timeout // len(protocols)
 
-        if check_country:
-            return {
-                'country': country[0],
-                'country_code': country[1],
-                'protocols': list(protocols.keys()),
-                'anonymity': anonymity,
-                'timeout': timeout
-            }
+        # Check remote address
+        if check_address:
+            remote_regex = 'REMOTE_ADDR = (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
+            remote_addr = re.search(remote_regex, r['response'])
+            if remote_addr:
+                remote_addr = remote_addr.group(1)
 
-        return {
+        results = {
             'protocols': list(protocols.keys()),
             'anonymity': anonymity,
             'timeout': timeout
         }
+
+        if check_country:
+            results['country'] = country[0]
+            results['country_code'] = country[1]
+
+        if check_address:
+            results['remote_address'] = remote_addr
+
+        return results
