@@ -105,21 +105,22 @@ class ProxyChecker:
         if (len(protocols) == 0):
             return False
 
+        r = protocols[random.choice(list(protocols.keys()))]['response']
+
         # Get country
         if check_country:
             country = self.get_country(proxy.split(':')[0])
 
         # Check anonymity
-        anonymity = self.parse_anonymity(
-            protocols[random.choice(list(protocols.keys()))]['response'])
+        anonymity = self.parse_anonymity(r)
 
         # Check timeout
         timeout = timeout // len(protocols)
 
         # Check remote address
         if check_address:
-            remote_regex = 'REMOTE_ADDR = (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
-            remote_addr = re.search(remote_regex, r['response'])
+            remote_regex = r'REMOTE_ADDR = (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
+            remote_addr = re.search(remote_regex, r)
             if remote_addr:
                 remote_addr = remote_addr.group(1)
 
