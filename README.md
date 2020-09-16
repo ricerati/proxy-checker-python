@@ -1,5 +1,7 @@
 # Proxy Checker (Python)
 
+[![Downloads](https://pepy.tech/badge/proxy-checker)](https://pepy.tech/project/proxy-checker)
+
 A proxy checker in Python using PycURL, a Python interface to libcurl.
 
 ## Description
