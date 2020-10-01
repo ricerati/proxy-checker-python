@@ -27,6 +27,10 @@ from proxy_checker import ProxyChecker
 checker = ProxyChecker()
 checker.check_proxy('<ip>:<port>')
 ```
+or with password:
+```
+checker.check_proxy('ip:port', user="username", password="passw0rd")
+```
 
 ```json
 {

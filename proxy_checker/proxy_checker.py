@@ -21,13 +21,16 @@ class ProxyChecker:
 
         return r['response']
 
-    def send_query(self, proxy=False, url=None):
+    def send_query(self, proxy=False, url=None, user=None, password=None):
         response = BytesIO()
         c = pycurl.Curl()
 
         c.setopt(c.URL, url or random.choice(self.proxy_judges))
         c.setopt(c.WRITEDATA, response)
         c.setopt(c.TIMEOUT, 5)
+
+        if user is not None and password is not None:
+            c.setopt(c.PROXYUSERPWD, f"{user}:{password}")            
 
         c.setopt(c.SSL_VERIFYHOST, 0)
         c.setopt(c.SSL_VERIFYPEER, 0)
@@ -86,13 +89,13 @@ class ProxyChecker:
 
         return ['-', '-']
 
-    def check_proxy(self, proxy, check_country=True, check_address=False):
+    def check_proxy(self, proxy, check_country=True, check_address=False, user=None, password=None):
         protocols = {}
         timeout = 0
 
         # Test the proxy for each protocol
         for protocol in ['http', 'socks4', 'socks5']:
-            r = self.send_query(proxy=protocol + '://' + proxy)
+            r = self.send_query(proxy=protocol + '://' + proxy, user=user, password=password)
 
             # Check if the request failed
             if not r:

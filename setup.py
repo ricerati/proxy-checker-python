@@ -5,7 +5,7 @@ with open('README.md', 'r') as f:
 
 setuptools.setup(
     name='proxy_checker',
-    version='0.4',
+    version='0.5e',
     packages=['proxy_checker'],
     install_requires=['pycurl'],
     author='ricerati',
