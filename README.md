@@ -32,19 +32,26 @@ checker.check_proxy('<ip>:<port>')
 {
   "country": "United States",
   "country_code": "US",
-  "protocols": [
-    "socks4",
-    "socks5"
-  ],
+  "protocols": ["socks4", "socks5"],
   "anonymity": "Elite",
   "timeout": 1649
 }
 ```
 
+## Parameters
+
+| Name          | Type | Default | Description                                          |
+| ------------- | ---- | ------- | ---------------------------------------------------- |
+| proxy         | str  |         | The proxy to test                                    |
+| check_country | bool | True    | If `true`, the proxy's country will be looked up     |
+| check_address | bool | False   | If `true`, the proxy's remote address will looked up |
+| user          | str  | None    | The proxy's username                                 |
+| password      | str  | None    | The proxy's password                                 |
+
 ## Requirements
 
-- Python 3.*
-- [PycURL](http://pycurl.io/) - A Python interface to libcurl *
+- Python 3.\*
+- [PycURL](http://pycurl.io/) - A Python interface to libcurl \*
 
 ###### \* If you have trouble installing PycURL on Windows, try to use Christoph Gohlke's collection of [Python Extension Package for Windows](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pycurl).
 
