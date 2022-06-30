@@ -143,7 +143,7 @@ class ProxyChecker:
                 :param, str. IP
             Return: Transparent, Anonymous or Elite
         '''
-        print(self.ip, r)
+
         if self.ip in r:
             return 'Transparent'
 
