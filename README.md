@@ -2,7 +2,9 @@
 
 [![Downloads](https://pepy.tech/badge/proxy-checker)](https://pepy.tech/project/proxy-checker)
 
-A proxy checker in Python using PycURL, a Python interface to libcurl.
+A proxy checker in Python using PycURL, a Python interface to libcurl. To install this modified version unninstall any other version and do:
+
+python3 -m pip install git+https://github.com/Scolymus/proxy-checker-python.git
 
 ## Description
 
