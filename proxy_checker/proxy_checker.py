@@ -219,7 +219,7 @@ class ProxyChecker:
             protocols_to_test = [protocol]
 
         # Test the proxy for each protocol
-        for retry in retries:
+        for retry in range(retries):
             for protocol in protocols_to_test:
                 r = self.send_query(proxy=protocol + '://' + proxy, user=user, password=password, tls=tls)
 
